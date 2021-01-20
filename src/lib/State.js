@@ -1,0 +1,5 @@
+export const State = Object.freeze({
+  INACTIVE: 'INACTIVE',
+  ACTIVE_SYNCHRONIZE: 'ACTIVE_SYNCHRONIZE',
+  ACTIVE_MEASURE: 'ACTIVE_MEASURE'
+});

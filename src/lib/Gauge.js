@@ -1,27 +1,26 @@
 import signal from 'signal-js';
-import { GaugeState } from './GaugeState';
+import Distance from './Distance';
+import Measurement from './Measurement';
+import { State } from './State';
 
 export default class Gauge {
   //--------------------------------------------------
   //--------------------------------------------------
 
   /** @type {Number} */
-  static LIGHT_MAX_TIME = 1000 * 60 * 60;
+  static LIGHT_TIME_MAX = 1000 * 60 * 60;
 
-  /** @type {GaugeState} */
-  #state = GaugeState.INACTIVE;
+  /** @type {State} */
+  #state = State.INACTIVE;
 
-  /** @type {LightEvent} */
-  #lastLightIsOnEvent;
-
-  /** @type {LightEvent} */
-  #lastLightIsOffEvent;
+  /** @type {Array.<Measurement>} */
+  #measurementData;
 
   /** @type {Number} */
-  #lightOnTime = 0;
+  #lightTimeOn = 0;
 
   /** @type {Number} */
-  #lightOffTime = 0;
+  #lightTimeOff = 0;
 
   /** @type {Distance} */
   #distance;
@@ -33,7 +32,7 @@ export default class Gauge {
   //--------------------------------------------------
 
   /**
-   * @param {GaugeState} value
+   * @param {State} value
    */
   set state(value) {
     if (this.#state == value) {
@@ -41,11 +40,14 @@ export default class Gauge {
       return;
     }
     switch (value) {
-      case GaugeState.ACTIVE_SYNCHRONIZE:
-        this.#lightOnTime = Gauge.LIGHT_MAX_TIME;
-        this.#lightOffTime = Gauge.LIGHT_MAX_TIME;
+      case State.ACTIVE_SYNCHRONIZE:
+        this.#measurementData = new Array();
+        this.#lightTimeOn = Gauge.LIGHT_TIME_MAX;
+        this.#lightTimeOff = Gauge.LIGHT_TIME_MAX;
         break;
-      case GaugeState.INACTIVE:
+      case State.ACTIVE_MEASURE:
+        break;
+      case State.INACTIVE:
         break;
       default:
         return;
@@ -64,22 +66,22 @@ export default class Gauge {
   /**
    * @returns {Number}
    */
-  get lightOnTime() {
-    return this.#lightOnTime;
+  get lightTimeOn() {
+    return this.#lightTimeOn;
   }
 
   /**
    * @returns {Number}
    */
-  get lightOffTime() {
-    return this.#lightOffTime;
+  get lightTimeOff() {
+    return this.#lightTimeOff;
   }
 
   /**
    * @returns {Boolean}
    */
   get isSynchronized() {
-    return (this.#lightOnTime < Gauge.LIGHT_MAX_TIME && this.#lightOffTime < Gauge.LIGHT_MAX_TIME)
+    return this.#lightTimeOn < Gauge.LIGHT_TIME_MAX && this.#lightTimeOff < Gauge.LIGHT_TIME_MAX;
   }
 
   //--------------------------------------------------
@@ -94,7 +96,8 @@ export default class Gauge {
     }
     console.info('Gauge | connectToDistance');
     this.#distance = distance;
-    this.#distance.connect(this._distanceListener.bind(this));
+    this.#distance.connect(Distance.EVENT_LIGHT, this._distanceLightListener.bind(this));
+    this.#distance.connect(Distance.EVENT_LENGTH, this._distanceLengthListener.bind(this));
   }
 
   /**
@@ -114,28 +117,41 @@ export default class Gauge {
   //--------------------------------------------------
 
   /**
-   * @param {LightEvent} lightEvent
+   * @param {Boolean} lightIsOn
    */
-  _distanceListener(lightEvent) {
-    // console.info('Gauge | _distanceListener | lightEvent=' + lightEvent);
-    lightEvent.gaugeTime = performance.now();
+  _distanceLightListener(lightIsOn) {
+    const measurement = new Measurement(lightIsOn, performance.now());
+    const measurementDataLength = this.#measurementData.length;
     switch (this.#state) {
-      case GaugeState.ACTIVE_SYNCHRONIZE:
-        if (lightEvent.isOn && this.#lastLightIsOffEvent) {
-          this.#lightOffTime = Math.min(this.#lightOffTime, lightEvent.gaugeTime - this.#lastLightIsOffEvent.gaugeTime);
-        } else if (!lightEvent.isOn && this.#lastLightIsOnEvent) {
-          this.#lightOnTime = Math.min(this.#lightOnTime, lightEvent.gaugeTime - this.#lastLightIsOnEvent.gaugeTime);
+      case State.ACTIVE_SYNCHRONIZE:
+        if (this.#measurementData.length != 0) {
+          let measurementLast = this.#measurementData[measurementDataLength - 1];
+          if (measurement.isOn == measurementLast.isOn) {
+            console.warn('Gauge | _distanceLightListener | sequence error | lightIsOn=' + lightIsOn + ', measurementLast.isOn=' + measurementLast.isOn);
+            return;
+          } else {
+            if (lightIsOn) {
+              this.#lightTimeOff = Math.min(this.#lightTimeOff, measurement.time - measurementLast.time);
+            } else {
+              this.#lightTimeOn = Math.min(this.#lightTimeOn, measurement.time - measurementLast.time);
+            }
+          }
         }
+        break;
+      case State.ACTIVE_MEASURE:
         break;
       default:
         return;
     }
-    if (lightEvent.isOn) {
-      this.#lastLightIsOnEvent = lightEvent;
-    } else {
-      this.#lastLightIsOffEvent = lightEvent;
-    }
+    this.#measurementData.push(measurement);
     this.#signal.emit('light', lightEvent);
+  }
+
+  /**
+   * @param {Number} lengthCurrent 
+   * @param {Number} lengthTarget 
+   */
+  _distanceLengthListener(lengthCurrent, lengthTarget) {
   }
 
   //--------------------------------------------------

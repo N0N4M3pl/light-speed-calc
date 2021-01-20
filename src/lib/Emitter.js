@@ -1,22 +1,21 @@
 import signal from 'signal-js';
-import { EmitterState } from './EmitterState';
-import LightEvent from './LightEvent';
+import { State } from './State';
 
 export default class Emitter {
   //--------------------------------------------------
   //--------------------------------------------------
 
-  /** @type {EmitterState} */
-  #state = EmitterState.INACTIVE;
+  /** @type {String} */
+  static EVENT_LIGHT = 'light';
+
+  /** @type {State} */
+  #state = State.INACTIVE;
 
   /** @type {Number} */
-  #lightOnTime = 1000;
+  #lightTimeOn = 1000;
 
   /** @type {Number} */
-  #lightOffTime = 1000;
-
-  /** @type {Number} */
-  #index;
+  #lightTimeOff = 1000;
 
   /** @type {Number} */
   #lightOnOffTimeoutId;
@@ -28,18 +27,18 @@ export default class Emitter {
   //--------------------------------------------------
 
   /**
-   * @param {Number} lightOnTime
-   * @param {Number} lightOffTime
+   * @param {Number} lightTimeOn
+   * @param {Number} lightTimeOff
    */
-  constructor(lightOnTime, lightOffTime) {
-    this.#lightOnTime = lightOnTime || 1000;
-    this.#lightOffTime = lightOffTime || 1000;
+  constructor(lightTimeOn, lightTimeOff) {
+    this.#lightTimeOn = lightTimeOn || 1000;
+    this.#lightTimeOff = lightTimeOff || 1000;
   }
 
   //--------------------------------------------------
 
   /**
-   * @param {EmitterState} value
+   * @param {State} value
    */
   set state(value) {
     if (this.#state == value) {
@@ -47,15 +46,15 @@ export default class Emitter {
       return;
     }
     switch (value) {
-      case EmitterState.ACTIVE:
+      case State.ACTIVE_SYNCHRONIZE:
+      case State.ACTIVE_MEASURE:
         if (this.#lightOnOffTimeoutId > 0) {
           console.warn('Emitter | set state | timer is working');
           return;
         }
-        this.#index = 0;
         this._lightOn();
         break;
-      case EmitterState.INACTIVE:
+      case State.INACTIVE:
         clearTimeout(this.#lightOnOffTimeoutId);
         this.#lightOnOffTimeoutId = -1;
         break;
@@ -69,46 +68,59 @@ export default class Emitter {
   /**
    * @returns {Number}
    */
-  get lightOnTime() {
-    return this.#lightOnTime;
+  get lightTimeOn() {
+    return this.#lightTimeOn;
+  }
+
+  /**
+   * @param {Number} value
+   */
+  set lightTimeOn(value) {
+    this.#lightTimeOn = Math.max(value, 0);
   }
 
   /**
    * @returns {Number}
    */
-  get lightOffTime() {
-    return this.#lightOffTime;
+  get lightTimeOff() {
+    return this.#lightTimeOff;
+  }
+
+  /**
+   * @param {Number} value
+   */
+  set lightTimeOff(value) {
+    this.#lightTimeOff = Math.max(value, 0);
   }
 
   //--------------------------------------------------
 
   /**
+   * @param {String} eventName
    * @param {Function} listener
    */
-  connect(listener) {
-    this.#signal.on('light', listener);
+  connect(eventName, listener) {
+    this.#signal.on(eventName, listener);
   }
 
   /**
+   * @param {String} eventName
    * @param {Function} listener
    */
-  disconnect(listener) {
-    this.#signal.off('light', listener);
+  disconnect(eventName, listener) {
+    this.#signal.off(eventName, listener);
   }
 
   //--------------------------------------------------
 
   _lightOn() {
-    this.#lightOnOffTimeoutId = setTimeout(this._lightOff.bind(this), this.#lightOnTime);
-    this.#index++;
-    const lightEvent = new LightEvent(true, this.#index, performance.now());
-    this.#signal.emit('light', lightEvent);
+    this.#signal.emit(Emitter.EVENT_LIGHT, true);
+    this.#lightOnOffTimeoutId = setTimeout(this._lightOff.bind(this), this.#lightTimeOn);
   }
 
   _lightOff() {
-    this.#lightOnOffTimeoutId = setTimeout(this._lightOn.bind(this), this.#lightOffTime);
-    const lightEvent = new LightEvent(false, this.#index, performance.now());
-    this.#signal.emit('light', lightEvent);
+    this.#signal.emit(Emitter.EVENT_LIGHT, false);
+    this.#lightOnOffTimeoutId = setTimeout(this._lightOn.bind(this), this.#lightTimeOff);
   }
 
   //--------------------------------------------------
