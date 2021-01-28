@@ -1,26 +1,40 @@
-export default class Measurement {
+export default class GaugeMeasurement {
   //--------------------------------------------------
   //--------------------------------------------------
 
   /** @type {Boolean} */
   isOn;
 
-  /** @type {Number} */
-  time;
+  /**
+   * UNIT: milliseconds 
+   * @type {Number}
+   */
+  timeGauge;
 
-  /** @type {Number} */
-  distanceLength;
+  /**
+   * UNIT: milliseconds 
+   * @type {Number}
+   */
+  timeEmitter;
+
+  /**
+   * UNIT: milliseconds 
+   * @type {Number}
+   */
+  timeDelay;
 
   //--------------------------------------------------
   //--------------------------------------------------
 
   /**
    * @param {Boolean} isOn
-   * @param {Number} time
+   * @param {Number} timeGauge UNIT: milliseconds 
    */
-  constructor(isOn, time) {
+  constructor(isOn, timeGauge) {
     this.isOn = isOn;
-    this.time = time;
+    this.timeGauge = timeGauge;
+    this.timeEmitter = timeGauge;
+    this.timeDelay = 0;
   }
 
   //--------------------------------------------------
