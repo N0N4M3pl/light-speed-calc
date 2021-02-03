@@ -30,7 +30,7 @@ export default {
           },
           {
             label: 'Emitter: light sending',
-            borderColor: colors.orange.base,
+            borderColor: colors.orange.lighten2,
             order: 1,
             xAxisID: 'time-x-axis',
             yAxisID: 'light-y-axis',
@@ -40,7 +40,7 @@ export default {
           },
           {
             label: 'Gauge: light receiving',
-            borderColor: colors.cyan.base,
+            borderColor: colors.cyan.lighten2,
             order: 2,
             xAxisID: 'time-x-axis',
             yAxisID: 'light-y-axis',
@@ -69,11 +69,21 @@ export default {
             data: []
           },
           {
-            label: 'Gauge: light delay (measured)',
+            label: 'Gauge: light time (measured)',
             borderColor: colors.cyan.darken3,
             order: 5,
             xAxisID: 'time-x-axis',
             yAxisID: 'light-delay-y-axis',
+            lineTension: 0,
+            fill: false,
+            data: []
+          },
+          {
+            label: 'Gauge: speed of light (measured)',
+            borderColor: colors.cyan.darken4,
+            order: 6,
+            xAxisID: 'time-x-axis',
+            yAxisID: 'speed-y-axis',
             lineTension: 0,
             fill: false,
             data: []
@@ -100,7 +110,7 @@ export default {
               id: 'state-y-axis',
               type: 'category',
               position: 'left',
-              labels: ['MEASURE', 'SEPARATION', 'SYNCHRONIZE', 'INACTIVE']
+              labels: ['MEASURE', 'COLLECTING', 'SEPARATION', 'SYNCHRONIZE', 'ACTIVE', 'INACTIVE']
             },
             {
               id: 'distance-y-axis',
@@ -109,6 +119,11 @@ export default {
             },
             {
               id: 'light-delay-y-axis',
+              position: 'right',
+              min: 0
+            },
+            {
+              id: 'speed-y-axis',
               position: 'right',
               min: 0
             }
@@ -159,7 +174,8 @@ export default {
       distanceLengthEvents,
       distanceLightDelayEvents,
       gaugeLightEvents,
-      gaugeMeasuredLightDelayEvents
+      gaugeMeasuredLightTimeEvents,
+      gaugeMeasuredSpeedOfLightEvents
     ) {
       const rangeMaxX = (stateEvents.length > 0 ? stateEvents[stateEvents.length - 1].x : 0) + 1000;
       this.config.options.plugins.zoom.pan.rangeMax.x = rangeMaxX;
@@ -169,7 +185,8 @@ export default {
       this.config.data.datasets[2].data = gaugeLightEvents;
       this.config.data.datasets[3].data = distanceLengthEvents;
       this.config.data.datasets[4].data = distanceLightDelayEvents;
-      this.config.data.datasets[5].data = gaugeMeasuredLightDelayEvents;
+      this.config.data.datasets[5].data = gaugeMeasuredLightTimeEvents;
+      this.config.data.datasets[6].data = gaugeMeasuredSpeedOfLightEvents;
       this.chart.update();
     }
   }

@@ -39,6 +39,9 @@ export default class Distance {
    */
   #lengthChangeSpeed = 1000;
 
+  /** @type {Boolean} */
+  #isSeperated = false;
+
   /** @type {Array.<Number>} */
   #lightEmitTimeoutIds;
 
@@ -52,7 +55,7 @@ export default class Distance {
    * UNIT: milliseconds 
    * @type {Number}
    */
-  #timeStartActiveSeparation;
+  #activeSeparationTimeStart;
 
   /** @type {Emmiter} */
   #emitter;
@@ -81,14 +84,14 @@ export default class Distance {
       case State.INACTIVE:
         this._removeAllLightEmits();
         break;
-      case State.ACTIVE_SYNCHRONIZE:
+      case State.ACTIVE:
         this.#lengthCurrent = 0;
+        this.#isSeperated = false;
         this.#lightEmitTimeoutIds = [];
         this.#lightEmitDelayCurrent = 0;
         break;
       case State.ACTIVE_SEPARATION:
-        // this.#lengthCurrent = 0;
-        this.#timeStartActiveSeparation = performance.now();
+        this.#activeSeparationTimeStart = performance.now();
         break;
     }
     // console.info('Distance | set state | ' + this.#state + ' -> ' + value);
@@ -149,6 +152,13 @@ export default class Distance {
    */
   set lengthTarget(value) {
     this.#lengthTarget = Math.max(value, 1);
+  }
+
+  /**
+   * @returns {Boolean}
+   */
+  get isSeperated() {
+    return this.#isSeperated;
   }
 
   /**
@@ -226,12 +236,13 @@ export default class Distance {
         this._addLightEmit(lightIsOn, this.#lengthCurrent / this.#speedOfLight);
         break;
       }
-      case State.ACTIVE_MEASURE: {
+      case State.ACTIVE_MEASURE:
+      case State.ACTIVE_COLLECTING: {
         this._addLightEmit(lightIsOn, this.#lengthTarget / this.#speedOfLight);
         break;
       }
     }
-    this.#signal.emit(Distance.EVENT_LENGTH, this.#lengthCurrent, this.#lengthTarget, this.#lightEmitDelayCurrent);
+    this.#signal.emit(Distance.EVENT_LENGTH, this.#lengthCurrent, this.#lightEmitDelayCurrent);
   }
 
   /**
@@ -240,6 +251,7 @@ export default class Distance {
    */
   _addLightEmit(lightIsOn, delay) {
     const id = setTimeout(() => {
+      // console.log('Distance | _addLightEmit | delay=' + delay)
       this.#signal.emit(Distance.EVENT_LIGHT, lightIsOn);
       // this.#signal.emit(Distance.EVENT_LENGTH, this.#lengthCurrent,
       // this.#lengthTarget, this.#lightEmitDelayCurrent);
@@ -258,8 +270,12 @@ export default class Distance {
 
   _updateLengthCurrent() {
     if (this.#lengthCurrent < this.#lengthTarget) {
-      const time = performance.now() - this.#timeStartActiveSeparation;
-      this.#lengthCurrent = Math.min(time * this.#lengthChangeSpeed, this.#lengthTarget);
+      const time = performance.now() - this.#activeSeparationTimeStart;
+      this.#lengthCurrent = time * this.#lengthChangeSpeed;
+      if (this.#lengthCurrent >= this.#lengthTarget) {
+        this.#lengthCurrent = this.#lengthTarget;
+        this.#isSeperated = true;
+      }
     }
   }
 

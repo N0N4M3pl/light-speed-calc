@@ -21,7 +21,19 @@ export default class GaugeMeasurement {
    * UNIT: milliseconds 
    * @type {Number}
    */
-  timeDelay;
+  timeDiff;
+
+  /**
+   * UNIT: meters 
+   * @type {Number}
+   */
+  distance;
+  
+  /**
+   * UNIT: meters / milliseconds 
+   * @type {Number}
+   */
+  speedOfLight;
 
   //--------------------------------------------------
   //--------------------------------------------------
@@ -34,7 +46,9 @@ export default class GaugeMeasurement {
     this.isOn = isOn;
     this.timeGauge = timeGauge;
     this.timeEmitter = timeGauge;
-    this.timeDelay = 0;
+    this.timeDiff = 0;
+    this.distance = 0;
+    this.speedOfLight = 0;
   }
 
   //--------------------------------------------------

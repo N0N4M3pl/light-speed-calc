@@ -15,13 +15,19 @@ export default class Emitter {
    * UNIT: milliseconds 
    * @type {Number}
    */
-  #lightTimeOn = 1000;
+  #lightOnTime = 1000;
 
   /**
    * UNIT: milliseconds 
    * @type {Number}
    */
-  #lightTimeOff = 1000;
+  #lightOffTime = 1000;
+
+  /** @type {Number} */
+  #lightOnAmount = 1;
+
+  /** @type {Number} */
+  #lightOnCounter = 0;
 
   /** @type {Number} */
   #lightOnOffTimeoutId = -1;
@@ -48,13 +54,19 @@ export default class Emitter {
     }
     switch (value) {
       case State.INACTIVE:
-        clearTimeout(this.#lightOnOffTimeoutId);
-        this.#lightOnOffTimeoutId = -1;
+        this._lightOnOffStop();
+        break;
+      case State.ACTIVE:
+        this.#lightOnCounter = 0;
         break;
       case State.ACTIVE_SYNCHRONIZE:
+      case State.ACTIVE_SEPARATION:
         if (this.#lightOnOffTimeoutId < 0) {
           this._lightOn();
         }
+        break;
+      case State.ACTIVE_MEASURE:
+        this._lightOnOffStop();
         break;
     }
     // console.info('Emitter | set state | ' + this.#state + ' -> ' + value);
@@ -64,58 +76,80 @@ export default class Emitter {
   /**
    * @returns {Number} UNIT: milliseconds
    */
-  get lightTimeOn() {
-    return this.#lightTimeOn;
+  get lightOnTime() {
+    return this.#lightOnTime;
   }
 
   /**
    * @param {Number} value UNIT: milliseconds
    */
-  set lightTimeOn(value) {
-    this.#lightTimeOn = Math.max(value, 0);
+  set lightOnTime(value) {
+    this.#lightOnTime = Math.max(value, 1);
   }
 
   /**
    * @returns {Number} UNIT: seconds
    */
-  get lightTimeOnInSeconds() {
-    return this.lightTimeOn / 1000;
+  get lightOnTimeInSeconds() {
+    return this.lightOnTime / 1000;
   }
 
   /**
    * @param {Number} value UNIT: seconds
    */
-  set lightTimeOnInSeconds(value) {
-    this.lightTimeOn = value * 1000;
+  set lightOnTimeInSeconds(value) {
+    this.lightOnTime = value * 1000;
   }
 
   /**
    * @returns {Number} UNIT: milliseconds
    */
-  get lightTimeOff() {
-    return this.#lightTimeOff;
+  get lightOffTime() {
+    return this.#lightOffTime;
   }
 
   /**
    * @param {Number} value UNIT: milliseconds
    */
-  set lightTimeOff(value) {
-    this.#lightTimeOff = Math.max(value, 0);
+  set lightOffTime(value) {
+    this.#lightOffTime = Math.max(value, 1);
   }
 
   /**
    * @returns {Number} UNIT: seconds
    */
-  get lightTimeOffInSeconds() {
-    return this.lightTimeOff / 1000;
+  get lightOffTimeInSeconds() {
+    return this.lightOffTime / 1000;
   }
 
   /**
    *  
    * @param {Number} value UNIT: seconds
    */
-  set lightTimeOffInSeconds(value) {
-    this.lightTimeOff = value * 1000;
+  set lightOffTimeInSeconds(value) {
+    this.lightOffTime = value * 1000;
+  }
+
+  /**
+   * @returns {Number}
+   */
+  get lightOnAmount() {
+    return this.#lightOnAmount;
+  }
+
+  /**
+   *  
+   * @param {Number} value
+   */
+  set lightOnAmount(value) {
+    this.#lightOnAmount = Math.max(value, 1);
+  }
+
+  /**
+   * @returns {Number}
+   */
+  get lightOnCounter() {
+    return this.#lightOnCounter;
   }
 
   //--------------------------------------------------
@@ -139,13 +173,22 @@ export default class Emitter {
   //--------------------------------------------------
 
   _lightOn() {
-    this.#lightOnOffTimeoutId = setTimeout(this._lightOff.bind(this), this.#lightTimeOn);
+    this.#lightOnOffTimeoutId = setTimeout(this._lightOff.bind(this), this.#lightOnTime);
     this.#signal.emit(Emitter.EVENT_LIGHT, true);
+    this.#lightOnCounter++;
   }
 
   _lightOff() {
-    this.#lightOnOffTimeoutId = setTimeout(this._lightOn.bind(this), this.#lightTimeOff);
+    this.#lightOnOffTimeoutId = setTimeout(this._lightOn.bind(this), this.#lightOffTime);
     this.#signal.emit(Emitter.EVENT_LIGHT, false);
+    if (this.#lightOnCounter == this.#lightOnAmount) {
+      this._lightOnOffStop();
+    }
+  }
+
+  _lightOnOffStop() {
+    clearTimeout(this.#lightOnOffTimeoutId);
+    this.#lightOnOffTimeoutId = -1;
   }
 
   //--------------------------------------------------

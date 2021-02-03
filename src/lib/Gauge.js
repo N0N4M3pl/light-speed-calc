@@ -23,25 +23,31 @@ export default class Gauge {
    * UNIT: milliseconds 
    * @type {Number}
    */
-  #lightTimeOn = 0;
+  #lightOnTime = 0;
 
   /**
    * UNIT: milliseconds 
    * @type {Number}
    */
-  #lightTimeOff = 0;
+  #lightOffTime = 0;
 
   /**
    * UNIT: milliseconds 
    * @type {Number}
    */
-  #timeStartActiveSynchronize;
+  #activeTimeStart;
 
   /** @type {Boolean} */
   #isSynchronized = false;
 
   /** @type {Number} */
   #synchronizationIndex = 0;
+
+  /**
+   * UNIT: meters / milliseconds 
+   * @type {Number}
+   */
+  #speedOfLight = 0;
 
   /** @type {Distance} */
   #distance;
@@ -69,16 +75,20 @@ export default class Gauge {
     switch (value) {
       case State.INACTIVE:
         break;
-      case State.ACTIVE_SYNCHRONIZE:
+      case State.ACTIVE:
         this.#measurementData = new Array();
-        this.#lightTimeOn = Gauge.LIGHT_TIME_MAX;
-        this.#lightTimeOff = Gauge.LIGHT_TIME_MAX;
-        this.#timeStartActiveSynchronize = performance.now();
         this.#isSynchronized = false;
+        this.#speedOfLight = Number.MAX_SAFE_INTEGER;
+        this.#activeTimeStart = performance.now();
+        break;
+      case State.ACTIVE_SYNCHRONIZE:
+        this.#lightOnTime = Gauge.LIGHT_TIME_MAX;
+        this.#lightOffTime = Gauge.LIGHT_TIME_MAX;
         this.#synchronizationIndex = 0;
         break;
-      default:
-        return;
+      case State.ACTIVE_SEPARATION:
+        this.#isSynchronized = true;
+        break;
     }
     // console.info('Gauge | set state | ' + this.#state + ' -> ' + value);
     this.#state = value;
@@ -92,31 +102,60 @@ export default class Gauge {
   }
 
   /**
-   * @returns {Number} UNIT: milliseconds 
+   * @returns {Number} UNIT: milliseconds
    */
-  get lightTimeOn() {
-    return this.#lightTimeOn;
+  get lightOnTime() {
+    return this.#lightOnTime;
   }
 
   /**
-   * @returns {Number} UNIT: seconds 
+   * @param {Number} value UNIT: milliseconds
    */
-  get lightTimeOnInSeconds() {
-    return this.lightTimeOn / 1000;
+  set lightOnTime(value) {
+    this.#lightOnTime = Math.max(value, 1);
   }
 
   /**
-   * @returns {Number} UNIT: milliseconds 
+   * @returns {Number} UNIT: seconds
    */
-  get lightTimeOff() {
-    return this.#lightTimeOff;
+  get lightOnTimeInSeconds() {
+    return this.lightOnTime / 1000;
   }
 
   /**
-   * @returns {Number} UNIT: seconds 
+   * @param {Number} value UNIT: seconds
    */
-  get lightTimeOffInSeconds() {
-    return this.lightTimeOff / 1000;
+  set lightOnTimeInSeconds(value) {
+    this.lightOnTime = value * 1000;
+  }
+
+  /**
+   * @returns {Number} UNIT: milliseconds
+   */
+  get lightOffTime() {
+    return this.#lightOffTime;
+  }
+
+  /**
+   * @param {Number} value UNIT: milliseconds
+   */
+  set lightOffTime(value) {
+    this.#lightOffTime = Math.max(value, 1);
+  }
+
+  /**
+   * @returns {Number} UNIT: seconds
+   */
+  get lightOffTimeInSeconds() {
+    return this.lightOffTime / 1000;
+  }
+
+  /**
+   *  
+   * @param {Number} value UNIT: seconds
+   */
+  set lightOffTimeInSeconds(value) {
+    this.lightOffTime = value * 1000;
   }
 
   /**
@@ -124,6 +163,20 @@ export default class Gauge {
    */
   get isSynchronized() {
     return this.#isSynchronized;
+  }
+
+  /**
+   * @returns {Number} UNIT: meters / milliseconds 
+   */
+  get speedOfLight() {
+    return this.#speedOfLight;
+  }
+
+  /**
+   * @returns {Number} UNIT: meters / seconds 
+   */
+  get speedOfLightInSeconds() {
+    return this.speedOfLight * 1000;
   }
 
   //--------------------------------------------------
@@ -163,34 +216,36 @@ export default class Gauge {
    * @param {Boolean} lightIsOn
    */
   _distanceLightListener(lightIsOn) {
-    const measurement = new GaugeMeasurement(lightIsOn, performance.now() - this.#timeStartActiveSynchronize);
+    const measurement = new GaugeMeasurement(lightIsOn, performance.now() - this.#activeTimeStart);
     const index = this.#measurementData.length;
     switch (this.#state) {
       case State.INACTIVE:
         return;
       case State.ACTIVE_SYNCHRONIZE:
       case State.ACTIVE_SEPARATION:
+      case State.ACTIVE_COLLECTING:
       case State.ACTIVE_MEASURE:
         if (index > 0) {
           const measurementLast = this.#measurementData[index - 1];
           if (this.#isSynchronized) {
-            measurement.timeEmitter = measurementLast.timeEmitter + (lightIsOn ? this.#lightTimeOff : this.#lightTimeOn);
-            measurement.timeDelay = measurement.timeGauge - measurement.timeEmitter;
+            measurement.timeEmitter = measurementLast.timeEmitter + (lightIsOn ? this.#lightOffTime : this.#lightOnTime);
+            measurement.timeDiff = measurement.timeGauge - measurement.timeEmitter;
+            measurement.distance = this.#distance.lengthCurrent;
+            measurement.speedOfLight = measurement.distance / measurement.timeDiff;
+            this.#speedOfLight = Math.min(measurement.speedOfLight, this.#speedOfLight);
+            // console.log('Gauge | tE=' + measurement.timeEmitter.toFixed(5) + ',\ttG=' + measurement.timeGauge.toFixed(5) + ',\tdiff=' + measurement.timeDiff.toFixed(5) + ',\tdist=' + measurement.distance.toFixed(5) + ',\tspeed=' + measurement.speedOfLight.toFixed(5));
           } else {
-            if (measurement.isOn == measurementLast.isOn) {
-              console.warn('Gauge | _distanceLightListener | sequence error');
-              return;
-            } else {
+            if (measurement.isOn != measurementLast.isOn) {
               let lightTime = measurement.timeGauge - measurementLast.timeGauge;
               let lightTimeHasChanged = false;
               if (lightIsOn) {
-                if (lightTime < this.#lightTimeOff) {
-                  this.#lightTimeOff = lightTime;
+                if (lightTime < this.#lightOffTime) {
+                  this.#lightOffTime = lightTime;
                   lightTimeHasChanged = true;
                 }
               } else {
-                if (lightTime < this.#lightTimeOn) {
-                  this.#lightTimeOn = lightTime;
+                if (lightTime < this.#lightOnTime) {
+                  this.#lightOnTime = lightTime;
                   lightTimeHasChanged = true;
                 }
               }
@@ -199,7 +254,7 @@ export default class Gauge {
               } else {
                 if (index - this.#synchronizationIndex > 6) {
                   this.#isSynchronized =
-                    this.#lightTimeOn < Gauge.LIGHT_TIME_MAX && this.#lightTimeOff < Gauge.LIGHT_TIME_MAX;
+                    this.#lightOnTime < Gauge.LIGHT_TIME_MAX && this.#lightOffTime < Gauge.LIGHT_TIME_MAX;
                 }
               }
             }
@@ -207,7 +262,7 @@ export default class Gauge {
         }
         break;
     }
-    // console.log('Gauge | _distanceLightListener | ' + index + '\t | ' + (lightIsOn ? 'ON' : 'OFF') + '\t | E=' + measurement.timeEmitter + '\t | G=' + measurement.timeGauge + '\t | delay=' + measurement.timeDelay + '\t | timeOn=' + this.#lightTimeOn.toFixed(0) + ', timeOff=' + this.#lightTimeOff.toFixed(0));
+    // console.log('Gauge | _distanceLightListener | ' + index + '\t | ' + (lightIsOn ? 'ON' : 'OFF') + '\t | E=' + measurement.timeEmitter + '\t | G=' + measurement.timeGauge + '\t | delay=' + measurement.timeDelay + '\t | timeOn=' + this.#lightOnTime.toFixed(0) + ', timeOff=' + this.#lightOffTime.toFixed(0));
     this.#measurementData.push(measurement);
     this.#signal.emit(Gauge.EVENT_MEASUREMENT, measurement);
   }
