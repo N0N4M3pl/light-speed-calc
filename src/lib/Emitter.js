@@ -56,7 +56,7 @@ export default class Emitter {
       case State.INACTIVE:
         this._lightOnOffStop();
         break;
-      case State.ACTIVE:
+      case State.ACTIVE_START:
         this.#lightOnCounter = 0;
         break;
       case State.ACTIVE_SYNCHRONIZE:
@@ -66,6 +66,9 @@ export default class Emitter {
         }
         break;
       case State.ACTIVE_MEASURE:
+        this._lightOnOffStop();
+        break;
+      case State.ACTIVE_STOP:
         this._lightOnOffStop();
         break;
     }
@@ -187,8 +190,10 @@ export default class Emitter {
   }
 
   _lightOnOffStop() {
-    clearTimeout(this.#lightOnOffTimeoutId);
-    this.#lightOnOffTimeoutId = -1;
+    if (this.#lightOnOffTimeoutId > 0) {
+      clearTimeout(this.#lightOnOffTimeoutId);
+      this.#lightOnOffTimeoutId = -1;
+    }
   }
 
   //--------------------------------------------------

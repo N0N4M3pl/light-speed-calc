@@ -73,9 +73,7 @@ export default class Gauge {
       return;
     }
     switch (value) {
-      case State.INACTIVE:
-        break;
-      case State.ACTIVE:
+      case State.ACTIVE_START:
         this.#measurementData = new Array();
         this.#isSynchronized = false;
         this.#speedOfLight = Number.MAX_SAFE_INTEGER;
@@ -220,6 +218,8 @@ export default class Gauge {
     const index = this.#measurementData.length;
     switch (this.#state) {
       case State.INACTIVE:
+      case State.ACTIVE_START:
+      case State.ACTIVE_STOP:
         return;
       case State.ACTIVE_SYNCHRONIZE:
       case State.ACTIVE_SEPARATION:

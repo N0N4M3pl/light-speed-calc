@@ -84,7 +84,7 @@ export default class Distance {
       case State.INACTIVE:
         this._removeAllLightEmits();
         break;
-      case State.ACTIVE:
+      case State.ACTIVE_START:
         this.#lengthCurrent = 0;
         this.#isSeperated = false;
         this.#lightEmitTimeoutIds = [];
@@ -92,6 +92,9 @@ export default class Distance {
         break;
       case State.ACTIVE_SEPARATION:
         this.#activeSeparationTimeStart = performance.now();
+        break;
+      case State.ACTIVE_STOP:
+        this._removeAllLightEmits();
         break;
     }
     // console.info('Distance | set state | ' + this.#state + ' -> ' + value);
@@ -253,8 +256,6 @@ export default class Distance {
     const id = setTimeout(() => {
       // console.log('Distance | _addLightEmit | delay=' + delay)
       this.#signal.emit(Distance.EVENT_LIGHT, lightIsOn);
-      // this.#signal.emit(Distance.EVENT_LENGTH, this.#lengthCurrent,
-      // this.#lengthTarget, this.#lightEmitDelayCurrent);
     }, delay);
 
     this.#lightEmitTimeoutIds.push(id);

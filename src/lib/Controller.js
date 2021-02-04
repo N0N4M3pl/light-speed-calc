@@ -36,13 +36,13 @@ export default class Controller {
   #measureAmountOfEmitterLightEvents;
 
   /** @type {Number} */
-  #activeCheckIntervalId = -1;
+  #activeStopCheckIntervalId = -1;
 
   /** @type {Number} */
-  #activeCheckTimeThreshold = -1;
+  #activeStopCheckTimeThreshold = -1;
 
   /** @type {Number} */
-  #activeCheckTime = -1;
+  #activeStopCheckTime = -1;
 
   /** @type {Array.<{x: Number, y: Number}>} */
   #stateEvents = [];
@@ -60,7 +60,7 @@ export default class Controller {
   #gaugeLightEvents = [];
 
   /** @type {Array.<{x: Number, y: Number}>} */
-  #gaugeMeasuredLightTimeEvents = [];
+  #gaugeMeasuredLightDelayEvents = [];
 
   /** @type {Array.<{x: Number, y: Number}>} */
   #gaugeMeasuredSpeedOfLightEvents = [];
@@ -87,31 +87,37 @@ export default class Controller {
     }
     switch (value) {
       case State.INACTIVE:
-        this._activeCheckStop();
+        this._activeStopCheckEnd();
         if (this.#modeIsAutomatic) {
           this.#emitter.lightOnAmount = 1;
         }
         break;
-      case State.ACTIVE:
-        this._activeCheckStop();
+      case State.ACTIVE_START:
+        this._activeStopCheckEnd();
         if (this.#modeIsAutomatic) {
           this.#emitter.lightOnAmount = Number.MAX_SAFE_INTEGER;
         }
-        this.#activeCheckTime = -1;
-        this.#activeCheckTimeThreshold = -1;
+        this.#activeStopCheckTime = -1;
+        this.#activeStopCheckTimeThreshold = -1;
         this.#stateEvents = [];
         this.#emitterLightEvents = [];
         this.#distanceLengthEvents = [];
         this.#distanceLightDelayEvents = [];
         this.#gaugeLightEvents = [];
-        this.#gaugeMeasuredLightTimeEvents = [];
+        this.#gaugeMeasuredLightDelayEvents = [];
         this.#gaugeMeasuredSpeedOfLightEvents = [];
         this.#activeTimeStart = performance.now();
         break;
       case State.ACTIVE_COLLECTING:
         if (this.#modeIsAutomatic) {
           this.#measureAmountOfEmitterLightEvents = 0;
-          this._activeCheckStart();
+          this._activeStopCheckBegin();
+        }
+        break;
+      case State.ACTIVE_STOP:
+        this._activeStopCheckEnd();
+        if (this.#modeIsAutomatic) {
+          this.#emitter.lightOnAmount = 1;
         }
         break;
     }
@@ -125,8 +131,11 @@ export default class Controller {
     setTimeout(() => {
       this.#signal.emit(Controller.EVENT_STATE, this.#state);
       switch (this.#state) {
-        case State.ACTIVE:
+        case State.ACTIVE_START:
           this.state = (this.#modeIsAutomatic) ? State.ACTIVE_SYNCHRONIZE : State.ACTIVE_SEPARATION;
+          break;
+        case State.ACTIVE_STOP:
+          this.state = State.INACTIVE;
           break;
       }
     }, 0);
@@ -184,8 +193,8 @@ export default class Controller {
   /**
    * @returns {Array.<{x: Number, y: Number}>}
    */
-  get gaugeMeasuredLightTimeEvents() {
-    return this.#gaugeMeasuredLightTimeEvents;
+  get gaugeMeasuredLightDelayEvents() {
+    return this.#gaugeMeasuredLightDelayEvents;
   }
 
   /**
@@ -244,11 +253,13 @@ export default class Controller {
       case State.ACTIVE_COLLECTING:
         if (this.#modeIsAutomatic) {
           this.#measureAmountOfEmitterLightEvents++;
-          if (this.#measureAmountOfEmitterLightEvents == 10) {
+          if (this.#measureAmountOfEmitterLightEvents == 3) {
+            console.log('Controller | _emitterLightListener | set state to ACTIVE_MEASURE | this.#measureAmountOfEmitterLightEvents == 3');
             this.state = State.ACTIVE_MEASURE;
           }
         } else {
           if (this.#emitter.lightOnCounter == this.#emitter.lightOnAmount) {
+            console.log('Controller | _emitterLightListener | set state to ACTIVE_MEASURE | this.#emitter.lightOnCounter == this.#emitter.lightOnAmount');
             this.state = State.ACTIVE_MEASURE;
           }
         }
@@ -270,10 +281,11 @@ export default class Controller {
    */
   _distanceLengthListener(lengthCurrent, lightEmitDelayCurrent) {
     this.#distanceLengthEvents.push(this._generateDistanceLengthEvent(lengthCurrent));
-    this.#distanceLightDelayEvents.push(this._generateLightTimeEvent(lightEmitDelayCurrent));
+    this.#distanceLightDelayEvents.push(this._generateLightDelayEvent(lightEmitDelayCurrent));
     switch (this.#state) {
       case State.ACTIVE_SEPARATION:
         if (this.#distance.isSeperated) {
+          console.log('Controller | _distanceLengthListener | set state to ACTIVE_COLLECTING | this.#distance.isSeperated');
           this.state = State.ACTIVE_COLLECTING;
         }
         break;
@@ -284,21 +296,23 @@ export default class Controller {
    * @param {GaugeMeasurement} measurement
    */
   _gaugeMeasurementListener(measurement) {
-    this.#gaugeMeasuredLightTimeEvents.push(this._generateLightTimeEvent(measurement.timeDiff));
+    this.#gaugeMeasuredLightDelayEvents.push(this._generateLightDelayEvent(measurement.timeDiff));
     if (this.#modeIsAutomatic) {
       switch (this.#state) {
         case State.ACTIVE_SYNCHRONIZE:
           if (this.#gauge.isSynchronized) {
+            console.log('Controller | _gaugeMeasurementListener | set state to ACTIVE_SEPARATION | this.#gauge.isSynchronized');
             this.state = State.ACTIVE_SEPARATION;
           }
           break;
-        case State.ACTIVE_SEPARATION:
+        // case State.ACTIVE_SEPARATION:
         case State.ACTIVE_COLLECTING:
           this.#gaugeMeasuredSpeedOfLightEvents.push(this._generateSpeedOfLightEvent(measurement.speedOfLight));
           break;
         case State.ACTIVE_MEASURE:
           this.#gaugeMeasuredSpeedOfLightEvents.push(this._generateSpeedOfLightEvent(measurement.speedOfLight));
-          this.#activeCheckTime = performance.now();
+          this.#activeStopCheckTime = performance.now();
+          console.log('Controller | _gaugeMeasurementListener | this.#activeStopCheckTime=' + this.#activeStopCheckTime);
           break;
       }
     } else {
@@ -308,23 +322,25 @@ export default class Controller {
 
   //--------------------------------------------------
 
-  _activeCheckStop() {
-    clearInterval(this.#activeCheckIntervalId);
-    this.#activeCheckIntervalId = -1;
+  _activeStopCheckEnd() {
+    clearInterval(this.#activeStopCheckIntervalId);
+    this.#activeStopCheckIntervalId = -1;
   }
 
-  _activeCheckStart() {
-    this.#activeCheckTimeThreshold = (this.#gauge.lightOnTime + this.#gauge.lightOffTime) * 2;
-    this.#activeCheckIntervalId = setInterval(this._activeCheck.bind(this), this.#activeCheckTimeThreshold);
+  _activeStopCheckBegin() {
+    this.#activeStopCheckTimeThreshold = (this.#gauge.lightOnTime + this.#gauge.lightOffTime) * 2;
+    console.log('Controller | _activeStopCheckBegin | this.#activeStopCheckTimeThreshold=' + this.#activeStopCheckTimeThreshold);
+    this.#activeStopCheckIntervalId = setInterval(this._activeStopCheck.bind(this), this.#activeStopCheckTimeThreshold);
   }
 
-  _activeCheck() {
-    if (this.#activeCheckTime > 0) {
-      const diff = performance.now() - this.#activeCheckTime;
+  _activeStopCheck() {
+    if (this.#activeStopCheckTime > 0) {
+      const diff = performance.now() - this.#activeStopCheckTime;
       // console.log('Controller | _activeCheck | ' + diff + ' > ' + this.#activeCheckTimeThreshold);
-      if (diff > this.#activeCheckTimeThreshold) {
+      if (diff > this.#activeStopCheckTimeThreshold) {
         // console.log('Controller | _activeCheck | ' + diff + ' > ' + this.#activeCheckTimeThreshold);
-        this.state = State.INACTIVE;
+        console.log('Controller | _activeStopCheck | set state to ACTIVE_STOP | diff > this.#activeStopCheckTimeThreshold | ' + diff + ' > ' + this.#activeStopCheckTimeThreshold);
+        this.state = State.ACTIVE_STOP;
       }
     }
   }
@@ -337,23 +353,26 @@ export default class Controller {
   _generateStateEvent(state) {
     const event = {
       x: performance.now() - this.#activeTimeStart,
-      y: 5
+      y: 6
     };
     switch (state) {
-      case State.ACTIVE:
-        event.y = 4;
+      case State.ACTIVE_START:
+        event.y -= 1;
         break
       case State.ACTIVE_SYNCHRONIZE:
-        event.y = 3;
+        event.y -= 2;
         break;
       case State.ACTIVE_SEPARATION:
-        event.y = 2;
+        event.y -= 3;
         break;
       case State.ACTIVE_COLLECTING:
-        event.y = 1;
+        event.y -= 4;
         break;
       case State.ACTIVE_MEASURE:
-        event.y = 0;
+        event.y -= 5;
+        break;
+      case State.ACTIVE_STOP:
+        event.y -= 6;
         break;
     }
     return event;
@@ -382,12 +401,12 @@ export default class Controller {
   }
 
   /**
-   * @param {Number} time
+   * @param {Number} delay
    */
-  _generateLightTimeEvent(time) {
+  _generateLightDelayEvent(delay) {
     return {
       x: performance.now() - this.#activeTimeStart,
-      y: time
+      y: delay
     };
   }
 

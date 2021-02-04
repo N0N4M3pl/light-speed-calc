@@ -1,53 +1,98 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <v-icon large color="grey darken-1">mdi-calculator-variant</v-icon>
-      <div class="text-overline">
+    <v-app-bar app color="blue-grey darken-3">
+      <v-icon large color="white">mdi-calculator-variant</v-icon>
+      <div class="text-overline white--text ml-2">
         light-speed-calc
       </div>
       <v-spacer></v-spacer>
-      <v-switch
-        v-model="modeIsAutomatic"
-        inset
-        dense
-        hide-details
-        :label="'Automatic mode is ' + (modeIsAutomatic ? 'ON' : 'OFF')"
-        :disabled="isActive()"
-      ></v-switch>
+      <div class="text-caption white--text">
+        By Mateusz Skafiriak
+      </div>
     </v-app-bar>
 
     <v-main>
-      <v-container fluid class="grey lighten-5">
-        <v-row>
-          <v-col cols="6">
-            <v-btn block @click="setupSimpleExample" color="grey lighten-1" :disabled="isActive()"
-              >Setup simple example</v-btn
-            >
-          </v-col>
-          <v-col cols="6">
-            <v-btn block @click="setupRealExample" color="grey lighten-1" :disabled="isActive()"
-              >Setup real example</v-btn
-            >
+      <v-container class="grey lighten-4">
+        <v-row class="mb-4 grey lighten-2">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">0</v-avatar
+            ><span class="font-italic text-caption"
+              ><b>Idea</b><br />Theoretical explanation of the measurement method</span
+            ></v-col
+          >
+          <v-col cols="9">
+            
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-col cols="12">
-            <v-text-field
-              prepend-inner-icon="mdi-speedometer"
-              label="Simulated speed of light - searched value, expected result of calculation/measure"
-              v-model="distance.speedOfLightInSeconds"
-              :disabled="isActive()"
-              suffix="m/s"
-              outlined
-              dense
-              hide-details
-            ></v-text-field>
+        <v-row class="mb-4 grey lighten-2">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">1</v-avatar
+            ><span class="font-italic text-caption"
+              ><b>Choose preset</b><br />Use already configured settings or configure it your way</span
+            ></v-col
+          >
+          <v-col cols="9" class="d-flex flex-row">
+            <v-btn @click="setupSimpleExample" color="blue-grey lighten-4" :disabled="isActive()" class="mr-4"
+              >Preset: simple example</v-btn
+            ><v-btn @click="setupRealExample" color="blue-grey lighten-4" :disabled="isActive()" class="mr-4"
+              >Preset: real example</v-btn
+            >
           </v-col>
         </v-row>
 
         <v-row class="mb-4">
-          <v-col cols="4">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">2</v-avatar
+            ><span class="font-italic text-caption"
+              ><b>Set <span class="text-decoration-underline">simulated</span> speed of light</b><br />This is searched
+              value, expected result of calculation/measure<br />Must be set because
+              <span class="light-green--text text--darken-2">Distance</span> element used this value for
+              simulating delay time that light need to travel specified distance
+            </span></v-col
+          >
+          <v-col cols="9">
+            <v-text-field
+              prepend-inner-icon="mdi-speedometer"
+              label="Simulated speed of light"
+              v-model="distance.speedOfLightInSeconds"
+              :disabled="isActive()"
+              suffix="m/s"
+              solo
+              hide-details
+              color="blue-grey"
+              background-color="blue-grey lighten-2"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row class="mb-4 grey lighten-2">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">3</v-avatar
+            ><span class="font-italic text-caption"
+              ><b>Choose mode of setup</b><br />Automatic mode - will auto recognize end of calculation (but its based
+              on code solution)<br />Manual mode - will stop calculation after emitting specified amout of light
+              ON</span
+            ></v-col
+          >
+          <v-col cols="9">
+            <v-switch
+              v-model="modeIsAutomatic"
+              inset
+              dense
+              hide-details
+              :label="'Automatic mode is ' + (modeIsAutomatic ? 'ON' : 'OFF')"
+              :disabled="isActive()"
+            ></v-switch>
+          </v-col>
+        </v-row>
+
+        <v-row class="mb-4">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">4</v-avatar
+            ><span class="font-italic text-caption"><b>Setup simulation elements</b></span></v-col
+          >
+          <v-col cols="3">
             <v-card outlined elevation="4" color="orange lighten-2">
               <v-card-title
                 >Emitter
@@ -93,9 +138,9 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="3">
             <v-card outlined elevation="4" color="light-green lighten-4">
-              <v-card-title> <v-spacer />Distance <v-spacer /></v-card-title>
+              <v-card-title><v-spacer />Distance<v-spacer /></v-card-title>
               <v-card-text>
                 <v-text-field
                   prepend-icon="mdi-map-marker-distance"
@@ -125,7 +170,7 @@
               </v-card-text>
             </v-card>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="3">
             <v-card outlined elevation="4" color="cyan lighten-2">
               <v-card-title>
                 <v-badge v-if="distanceLightStatus === 1" :content="distanceLightIndex" color="cyan lighten-2">
@@ -161,32 +206,161 @@
           </v-col>
         </v-row>
 
-        <v-row class="mb-4">
-          <v-col cols="12">
-            <v-btn block @click="controllerActiveInactive" color="grey lighten-1">{{
+        <v-row class="mb-4 grey lighten-2">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">5</v-avatar
+            ><span class="font-italic text-caption"><b>Execute calculation</b></span></v-col
+          >
+          <v-col cols="9">
+            <v-btn large @click="controllerActiveInactive" color="blue-grey lighten-2">{{
               !isActive() ? 'START CALCULATION' : 'STOP CALCULATION'
             }}</v-btn>
+            <v-progress-linear
+              v-show="isActive()"
+              class="mt-2"
+              color="blue-grey"
+              height="8"
+              :value="progressValue"
+              striped
+              rounded
+            ></v-progress-linear>
+            <v-alert
+              v-show="!modeIsAutomatic && isActive() && progressValue == 100"
+              dense
+              outlined
+              text
+              type="warning"
+              color="red"
+              border="left"
+              class="mt-2 mb-0"
+              >Automatic mode is OFF - Stop calculation manually now</v-alert
+            >
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-col cols="12">
+        <v-row class="mb-4">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">6</v-avatar
+            ><span class="font-italic text-caption"
+              ><b>Measured speed of light</b><br />Result of calculation/measure</span
+            ></v-col
+          >
+          <v-col cols="9">
             <v-text-field
               prepend-inner-icon="mdi-speedometer"
-              label="Measured speed of light - result of calculation/measure"
+              label="Measured speed of light"
               v-model="gauge.speedOfLightInSeconds"
               readonly
               suffix="m/s"
-              outlined
+              solo
               dense
               hide-details
+              color="blue-grey"
+              background-color="blue-grey lighten-2"
             ></v-text-field>
+            <v-alert
+              v-show="!isActive() && speedOfLightResultDiff != 0"
+              dense
+              outlined
+              text
+              type="warning"
+              color="red"
+              border="left"
+              class="mt-2 mb-0"
+              >{{ speedOfLightResultDiff }} m/s - Differenece between the simulated value and result of
+              calculation</v-alert
+            >
           </v-col>
         </v-row>
 
-        <v-row>
-          <v-col cols="12">
+        <v-row class="grey lighten-2">
+          <v-col cols="12"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 grey--text"
+              ><v-icon color="white" small>
+                mdi-chart-line
+              </v-icon></v-avatar
+            ><span class="font-italic text-caption"><b>Charts for analysis</b></span>
             <chart ref="chartEle" />
+          </v-col>
+        </v-row>
+
+        <v-row class="grey lighten-2 pb-8">
+          <v-col cols="3">
+            <v-avatar color="blue-grey" size="34" class="mr-2 grey--text">
+              <v-icon color="white" small>
+                mdi-filter
+              </v-icon></v-avatar
+            ><span class="font-italic text-caption"><b>Filters for chart data</b></span>
+          </v-col>
+          <v-col cols="9" class="font-italic text-caption">
+            <v-btn-toggle v-model="chartFilter" mandatory group color="blue-grey darken-4">
+              <v-btn @click="chartShowAllData">
+                Show all
+              </v-btn>
+              <v-btn @click="chartShowOnlyLightOnOffData">
+                Light ON/OFF
+              </v-btn>
+              <v-btn @click="chartShowOnlyDistanceLengthData">
+                Distance length
+              </v-btn>
+              <v-btn @click="chartShowOnlyLightDelayData">
+                Light delay
+              </v-btn>
+              <v-btn @click="chartShowOnlySpeedOfLightData">
+                Speed of light
+              </v-btn> </v-btn-toggle
+            ><br />
+
+            <v-alert
+              v-if="chartFilter == 0"
+              dense
+              outlined
+              text
+              type="info"
+              color="blue-grey"
+              border="left"
+              >Show all data on chart</v-alert
+            >
+            <v-alert
+              v-else-if="chartFilter == 1"
+              dense
+              outlined
+              text
+              type="info"
+              color="blue-grey"
+              border="left"
+              >This view shows flashes of light. During and after separation state - both lines should not overlap.</v-alert
+            >
+            <v-alert
+              v-else-if="chartFilter == 2"
+              dense
+              outlined
+              text
+              type="info"
+              color="blue-grey"
+              border="left"
+              >This view shows distance which is increasing during separation state.</v-alert
+            >
+            <v-alert
+              v-else-if="chartFilter == 3"
+              dense
+              outlined
+              text
+              type="info"
+              color="blue-grey"
+              border="left"
+              >This view shows light delays. Distance object is simulating time which light need to travel specific distance. Gauge object measure this delays.</v-alert
+            >
+            <v-alert
+              v-else-if="chartFilter == 4"
+              dense
+              outlined
+              text
+              type="info"
+              color="blue-grey"
+              border="left"
+              >This view shows calculated speed of light.</v-alert
+            >
           </v-col>
         </v-row>
       </v-container>
@@ -211,12 +385,15 @@ export default {
     distance: new Distance(),
     gauge: new Gauge(),
     modeIsAutomatic: true,
+    progressValue: 0,
     lightOnTimeInSeconds: 0,
     lightOffTimeInSeconds: 0,
     emitterLightStatus: -1,
     emitterLightIndex: 0,
     distanceLightStatus: -1,
-    distanceLightIndex: 0
+    distanceLightIndex: 0,
+    speedOfLightResultDiff: 0,
+    chartFilter: null
   }),
   watch: {
     modeIsAutomatic: function(newValue) {
@@ -268,19 +445,47 @@ export default {
         case State.INACTIVE:
           this.emitterLightStatus = -1;
           this.distanceLightStatus = -1;
+          break;
+        case State.ACTIVE_START:
+          this.progressValue = 0;
+          this.emitterLightIndex = 0;
+          this.distanceLightIndex = 0;
+          this.speedOfLightResultDiff = 0;
+          break;
+        case State.ACTIVE_SYNCHRONIZE:
+          if (this.modeIsAutomatic) {
+            this.progressValue = 20;
+          }
+          break;
+        case State.ACTIVE_SEPARATION:
+          if (this.modeIsAutomatic) {
+            this.progressValue = 40;
+          }
+          break;
+        case State.ACTIVE_COLLECTING:
+          if (this.modeIsAutomatic) {
+            this.progressValue = 60;
+          }
+          break;
+        case State.ACTIVE_MEASURE:
+          if (this.modeIsAutomatic) {
+            this.progressValue = 80;
+          }
+          break;
+        case State.ACTIVE_STOP:
+          this.progressValue = 100;
+          this.speedOfLightResultDiff = (
+            this.gauge.speedOfLightInSeconds - this.distance.speedOfLightInSeconds
+          ).toFixed(2);
           this.$refs.chartEle.updateData(
             this.controller.stateEvents,
             this.controller.emitterLightEvents,
             this.controller.distanceLengthEvents,
             this.controller.distanceLightDelayEvents,
             this.controller.gaugeLightEvents,
-            this.controller.gaugeMeasuredLightTimeEvents,
+            this.controller.gaugeMeasuredLightDelayEvents,
             this.controller.gaugeMeasuredSpeedOfLightEvents
           );
-          break;
-        case State.ACTIVE:
-          this.emitterLightIndex = 0;
-          this.distanceLightIndex = 0;
           break;
       }
     },
@@ -296,30 +501,72 @@ export default {
       if (lightIsOn) {
         this.distanceLightStatus = 1;
         this.distanceLightIndex++;
+        if (!this.modeIsAutomatic) {
+          this.progressValue = (this.distanceLightIndex / this.emitter.lightOnAmount) * 100;
+        }
       } else {
         this.distanceLightStatus = 0;
       }
     },
     controllerActiveInactive() {
-      this.controller.state = this.controller.state == State.INACTIVE ? State.ACTIVE : State.INACTIVE;
+      this.controller.state = this.controller.state == State.INACTIVE ? State.ACTIVE_START : State.ACTIVE_STOP;
     },
     setupSimpleExample() {
-      this.lightOnTimeInSeconds = 0.1;
-      this.lightOffTimeInSeconds = 0.1;
+      this.emitter.lightOnTimeInSeconds = 0.1;
+      this.emitter.lightOffTimeInSeconds = 0.1;
       this.emitter.lightOnAmount = 25;
       this.distance.speedOfLightInSeconds = 0.1;
       this.distance.lengthTarget = 1000;
       this.distance.lengthChangeSpeedInSeconds = 250;
+      this.gauge.lightOnTimeInSeconds = this.emitter.lightOnTimeInSeconds;
+      this.gauge.lightOffTimeInSeconds = this.emitter.lightOffTimeInSeconds;
+      this.lightOnTimeInSeconds = this.emitter.lightOnTimeInSeconds;
+      this.lightOffTimeInSeconds = this.emitter.lightOffTimeInSeconds;
       this.$forceUpdate();
     },
     setupRealExample() {
-      this.lightOnTimeInSeconds = 1;
-      this.lightOffTimeInSeconds = 1;
+      this.emitter.lightOnTimeInSeconds = 1;
+      this.emitter.lightOffTimeInSeconds = 1;
       this.emitter.lightOnAmount = 30;
       this.distance.speedOfLightInSeconds = 299792458;
       this.distance.lengthTarget = 2997924580;
       this.distance.lengthChangeSpeedInSeconds = 299792458;
+      this.gauge.lightOnTimeInSeconds = this.emitter.lightOnTimeInSeconds;
+      this.gauge.lightOffTimeInSeconds = this.emitter.lightOffTimeInSeconds;
+      this.lightOnTimeInSeconds = this.emitter.lightOnTimeInSeconds;
+      this.lightOffTimeInSeconds = this.emitter.lightOffTimeInSeconds;
       this.$forceUpdate();
+    },
+    chartShowOnlyLightOnOffData() {
+      this.$refs.chartEle.lightOnOffDataIsHidden(false);
+      this.$refs.chartEle.distanceLengthDataIsHidden(true);
+      this.$refs.chartEle.lightDelayDataIsHidden(true);
+      this.$refs.chartEle.speedOfLightDataIsHidden(true);
+    },
+    chartShowOnlyDistanceLengthData() {
+      this.$refs.chartEle.lightOnOffDataIsHidden(true);
+      this.$refs.chartEle.distanceLengthDataIsHidden(false);
+      this.$refs.chartEle.lightDelayDataIsHidden(true);
+      this.$refs.chartEle.speedOfLightDataIsHidden(true);
+    },
+    chartShowOnlyLightDelayData() {
+      this.$refs.chartEle.lightOnOffDataIsHidden(true);
+      this.$refs.chartEle.distanceLengthDataIsHidden(true);
+      this.$refs.chartEle.lightDelayDataIsHidden(false);
+      this.$refs.chartEle.speedOfLightDataIsHidden(true);
+    },
+    chartShowOnlySpeedOfLightData() {
+      this.$refs.chartEle.lightOnOffDataIsHidden(true);
+      this.$refs.chartEle.distanceLengthDataIsHidden(true);
+      this.$refs.chartEle.lightDelayDataIsHidden(true);
+      this.$refs.chartEle.speedOfLightDataIsHidden(false);
+    },
+    chartShowAllData() {
+      this.$refs.chartEle.lightOnOffDataIsHidden(false);
+      this.$refs.chartEle.distanceLengthDataIsHidden(false);
+      this.$refs.chartEle.lightDelayDataIsHidden(false);
+      this.$refs.chartEle.speedOfLightDataIsHidden(false);
+      this.$refs.chartEle.resetZoom();
     }
   }
 };
