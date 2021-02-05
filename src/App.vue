@@ -15,18 +15,6 @@
       <v-container class="grey lighten-4">
         <v-row class="mb-4 grey lighten-2">
           <v-col cols="3"
-            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">0</v-avatar
-            ><span class="font-italic text-caption"
-              ><b>Idea</b><br />Theoretical explanation of the measurement method</span
-            ></v-col
-          >
-          <v-col cols="9">
-            
-          </v-col>
-        </v-row>
-
-        <v-row class="mb-4 grey lighten-2">
-          <v-col cols="3"
             ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">1</v-avatar
             ><span class="font-italic text-caption"
               ><b>Choose preset</b><br />Use already configured settings or configure it your way</span
@@ -47,8 +35,8 @@
             ><span class="font-italic text-caption"
               ><b>Set <span class="text-decoration-underline">simulated</span> speed of light</b><br />This is searched
               value, expected result of calculation/measure<br />Must be set because
-              <span class="light-green--text text--darken-2">Distance</span> element used this value for
-              simulating delay time that light need to travel specified distance
+              <span class="light-green--text text--darken-2">Distance</span> element used this value for simulating
+              delay time that light need to travel specified distance
             </span></v-col
           >
           <v-col cols="9">
@@ -284,7 +272,7 @@
           </v-col>
         </v-row>
 
-        <v-row class="grey lighten-2 pb-8">
+        <v-row class="grey lighten-2 mb-4">
           <v-col cols="3">
             <v-avatar color="blue-grey" size="34" class="mr-2 grey--text">
               <v-icon color="white" small>
@@ -293,74 +281,56 @@
             ><span class="font-italic text-caption"><b>Filters for chart data</b></span>
           </v-col>
           <v-col cols="9" class="font-italic text-caption">
-            <v-btn-toggle v-model="chartFilter" mandatory group color="blue-grey darken-4">
-              <v-btn @click="chartShowAllData">
+            <v-btn-toggle v-model="chartFilter" mandatory group dense color="blue-grey darken-4">
+              <v-btn @click="chartShowAllData" small>
                 Show all
               </v-btn>
-              <v-btn @click="chartShowOnlyLightOnOffData">
+              <v-btn @click="chartShowOnlyLightOnOffData" small>
                 Light ON/OFF
               </v-btn>
-              <v-btn @click="chartShowOnlyDistanceLengthData">
+              <v-btn @click="chartShowOnlyDistanceLengthData" small>
                 Distance length
               </v-btn>
-              <v-btn @click="chartShowOnlyLightDelayData">
+              <v-btn @click="chartShowOnlyLightDelayData" small>
                 Light delay
               </v-btn>
-              <v-btn @click="chartShowOnlySpeedOfLightData">
+              <v-btn @click="chartShowOnlySpeedOfLightData" small>
                 Speed of light
               </v-btn> </v-btn-toggle
             ><br />
 
-            <v-alert
-              v-if="chartFilter == 0"
-              dense
-              outlined
-              text
-              type="info"
-              color="blue-grey"
-              border="left"
+            <v-alert v-if="chartFilter == 0" dense outlined text type="info" color="blue-grey" border="left"
               >Show all data on chart</v-alert
             >
-            <v-alert
-              v-else-if="chartFilter == 1"
-              dense
-              outlined
-              text
-              type="info"
-              color="blue-grey"
-              border="left"
-              >This view shows flashes of light. During and after separation state - both lines should not overlap.</v-alert
+            <v-alert v-else-if="chartFilter == 1" dense outlined text type="info" color="blue-grey" border="left"
+              >This view shows flashes of light. During and after separation state - both lines should not
+              overlap.</v-alert
             >
-            <v-alert
-              v-else-if="chartFilter == 2"
-              dense
-              outlined
-              text
-              type="info"
-              color="blue-grey"
-              border="left"
+            <v-alert v-else-if="chartFilter == 2" dense outlined text type="info" color="blue-grey" border="left"
               >This view shows distance which is increasing during separation state.</v-alert
             >
-            <v-alert
-              v-else-if="chartFilter == 3"
-              dense
-              outlined
-              text
-              type="info"
-              color="blue-grey"
-              border="left"
-              >This view shows light delays. Distance object is simulating time which light need to travel specific distance. Gauge object measure this delays.</v-alert
+            <v-alert v-else-if="chartFilter == 3" dense outlined text type="info" color="blue-grey" border="left"
+              >This view shows light delays. Distance object is simulating time which light need to travel specific
+              distance. Gauge object measure this delays.</v-alert
             >
-            <v-alert
-              v-else-if="chartFilter == 4"
-              dense
-              outlined
-              text
-              type="info"
-              color="blue-grey"
-              border="left"
-              >This view shows calculated speed of light.</v-alert
+            <v-alert v-else-if="chartFilter == 4" dense outlined text type="info" color="blue-grey" border="left"
+              >This view shows calculated speed of light with data from which speed of light is calculated: distance and
+              delay time (<code>distance / delay = speed</code>).</v-alert
             >
+          </v-col>
+        </v-row>
+
+        <v-row class="mb-4">
+          <v-col cols="12" class="text-center">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+              ><img
+                alt="Creative Commons License"
+                style="border-width:0"
+                src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png"/></a
+            ><br />This work is licensed under a
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"
+              >Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License</a
+            >.
           </v-col>
         </v-row>
       </v-container>
@@ -476,7 +446,7 @@ export default {
           this.progressValue = 100;
           this.speedOfLightResultDiff = (
             this.gauge.speedOfLightInSeconds - this.distance.speedOfLightInSeconds
-          ).toFixed(2);
+          ).toFixed(0);
           this.$refs.chartEle.updateData(
             this.controller.stateEvents,
             this.controller.emitterLightEvents,
@@ -537,36 +507,36 @@ export default {
       this.lightOffTimeInSeconds = this.emitter.lightOffTimeInSeconds;
       this.$forceUpdate();
     },
+    chartShowAllData() {
+      this.$refs.chartEle.lightOnOffDataIsHidden(false);
+      this.$refs.chartEle.distanceLengthDataIsHidden(false);
+      this.$refs.chartEle.lightDelayDataIsHidden(false, false);
+      this.$refs.chartEle.speedOfLightDataIsHidden(false);
+      this.$refs.chartEle.resetZoom();
+    },
     chartShowOnlyLightOnOffData() {
       this.$refs.chartEle.lightOnOffDataIsHidden(false);
       this.$refs.chartEle.distanceLengthDataIsHidden(true);
-      this.$refs.chartEle.lightDelayDataIsHidden(true);
+      this.$refs.chartEle.lightDelayDataIsHidden(true, true);
       this.$refs.chartEle.speedOfLightDataIsHidden(true);
     },
     chartShowOnlyDistanceLengthData() {
       this.$refs.chartEle.lightOnOffDataIsHidden(true);
       this.$refs.chartEle.distanceLengthDataIsHidden(false);
-      this.$refs.chartEle.lightDelayDataIsHidden(true);
+      this.$refs.chartEle.lightDelayDataIsHidden(true, true);
       this.$refs.chartEle.speedOfLightDataIsHidden(true);
     },
     chartShowOnlyLightDelayData() {
       this.$refs.chartEle.lightOnOffDataIsHidden(true);
       this.$refs.chartEle.distanceLengthDataIsHidden(true);
-      this.$refs.chartEle.lightDelayDataIsHidden(false);
+      this.$refs.chartEle.lightDelayDataIsHidden(false, false);
       this.$refs.chartEle.speedOfLightDataIsHidden(true);
     },
     chartShowOnlySpeedOfLightData() {
       this.$refs.chartEle.lightOnOffDataIsHidden(true);
-      this.$refs.chartEle.distanceLengthDataIsHidden(true);
-      this.$refs.chartEle.lightDelayDataIsHidden(true);
-      this.$refs.chartEle.speedOfLightDataIsHidden(false);
-    },
-    chartShowAllData() {
-      this.$refs.chartEle.lightOnOffDataIsHidden(false);
       this.$refs.chartEle.distanceLengthDataIsHidden(false);
-      this.$refs.chartEle.lightDelayDataIsHidden(false);
+      this.$refs.chartEle.lightDelayDataIsHidden(true, false);
       this.$refs.chartEle.speedOfLightDataIsHidden(false);
-      this.$refs.chartEle.resetZoom();
     }
   }
 };

@@ -310,13 +310,19 @@ export default class Controller {
           this.#gaugeMeasuredSpeedOfLightEvents.push(this._generateSpeedOfLightEvent(measurement.speedOfLight));
           break;
         case State.ACTIVE_MEASURE:
+          this.#distanceLengthEvents.push(this._generateDistanceLengthEvent(measurement.distance));
           this.#gaugeMeasuredSpeedOfLightEvents.push(this._generateSpeedOfLightEvent(measurement.speedOfLight));
           this.#activeStopCheckTime = performance.now();
           console.log('Controller | _gaugeMeasurementListener | this.#activeStopCheckTime=' + this.#activeStopCheckTime);
           break;
       }
     } else {
-      this.#gaugeMeasuredSpeedOfLightEvents.push(this._generateSpeedOfLightEvent(measurement.speedOfLight));
+      switch (this.#state) {
+        case State.ACTIVE_MEASURE:
+          this.#distanceLengthEvents.push(this._generateDistanceLengthEvent(measurement.distance));
+          this.#gaugeMeasuredSpeedOfLightEvents.push(this._generateSpeedOfLightEvent(measurement.speedOfLight));
+          break;
+      }
     }
   }
 
@@ -328,7 +334,7 @@ export default class Controller {
   }
 
   _activeStopCheckBegin() {
-    this.#activeStopCheckTimeThreshold = (this.#gauge.lightOnTime + this.#gauge.lightOffTime) * 2;
+    this.#activeStopCheckTimeThreshold = (this.#gauge.lightOnTime + this.#gauge.lightOffTime) * 3;
     console.log('Controller | _activeStopCheckBegin | this.#activeStopCheckTimeThreshold=' + this.#activeStopCheckTimeThreshold);
     this.#activeStopCheckIntervalId = setInterval(this._activeStopCheck.bind(this), this.#activeStopCheckTimeThreshold);
   }

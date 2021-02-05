@@ -1,24 +1,26 @@
 # light-speed-calc
 
-## Project setup
+Project is divided into two side:
+
+- Web application: [light-speed-calc]()
+- Document: [Theoretical explanation of how to measure the speed of light in one way](/doc/theoretical-explanation-of-how-tomeasure-the-speed-of-light-in-one-way.md)
+
+## Web aplication
+
+### Commands
+
 ```
 npm install
-```
-
-### Compiles and hot-reloads for development
-```
 npm run serve
-```
-
-### Compiles and minifies for production
-```
 npm run build
-```
-
-### Lints and fixes files
-```
 npm run lint
 ```
+### Useful link
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- [Vue.js](https://vuejs.org/)
+- [Vuetify.js](https://vuetifyjs.com/)
+- [Chart.js](https://www.chartjs.org/)
+
+## Licence
+
+[License](LICENSE.md) 

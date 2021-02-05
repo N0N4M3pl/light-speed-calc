@@ -214,10 +214,10 @@ export default {
       this.chart.options.scales.yAxes[2].display = !value;
       this.chart.update();
     },
-    lightDelayDataIsHidden(value) {
-      this.chart.getDatasetMeta(4).hidden = value;
-      this.chart.getDatasetMeta(5).hidden = value;
-      this.chart.options.scales.yAxes[3].display = !value;
+    lightDelayDataIsHidden(distanceValue, gaugeValue) {
+      this.chart.getDatasetMeta(4).hidden = distanceValue;
+      this.chart.getDatasetMeta(5).hidden = gaugeValue;
+      this.chart.options.scales.yAxes[3].display = !(distanceValue && gaugeValue);
       this.chart.update();
     },
     speedOfLightDataIsHidden(value) {

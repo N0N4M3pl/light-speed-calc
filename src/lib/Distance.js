@@ -253,6 +253,7 @@ export default class Distance {
    * @param {Number} delay
    */
   _addLightEmit(lightIsOn, delay) {
+    delay *= 0.967;
     const id = setTimeout(() => {
       // console.log('Distance | _addLightEmit | delay=' + delay)
       this.#signal.emit(Distance.EVENT_LIGHT, lightIsOn);

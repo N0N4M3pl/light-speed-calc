@@ -233,7 +233,7 @@ export default class Gauge {
             measurement.distance = this.#distance.lengthCurrent;
             measurement.speedOfLight = measurement.distance / measurement.timeDiff;
             this.#speedOfLight = Math.min(measurement.speedOfLight, this.#speedOfLight);
-            // console.log('Gauge | tE=' + measurement.timeEmitter.toFixed(5) + ',\ttG=' + measurement.timeGauge.toFixed(5) + ',\tdiff=' + measurement.timeDiff.toFixed(5) + ',\tdist=' + measurement.distance.toFixed(5) + ',\tspeed=' + measurement.speedOfLight.toFixed(5));
+            console.log('Gauge | tE=' + measurement.timeEmitter.toFixed(5) + ',\ttG=' + measurement.timeGauge.toFixed(5) + ',\tdiff=' + measurement.timeDiff.toFixed(5) + ',\tdist=' + measurement.distance.toFixed(5) + ',\tspeed=' + measurement.speedOfLight.toFixed(5));
           } else {
             if (measurement.isOn != measurementLast.isOn) {
               let lightTime = measurement.timeGauge - measurementLast.timeGauge;
