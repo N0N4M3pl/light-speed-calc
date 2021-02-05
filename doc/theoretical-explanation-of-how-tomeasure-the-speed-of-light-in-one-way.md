@@ -1,6 +1,6 @@
 # Theoretical explanation of how to measure the speed of light in one way
 
-## Problem explanation
+## Problem
 
 Problem of measuring speed of light in one direction is describe in:
 
@@ -11,7 +11,14 @@ Problem of measuring speed of light in one direction is describe in:
 Main trouble of on way measuring is synchronization two clocks/timers.  
 Source timer and detector timer cannot be started at exactly same time.
 
-## Solution - theoretical explanation
+## Solution 
+
+### At first
+
+This solution is only based on theoretical model and web application simulation.  
+It was not done in real environment, using real, existing devices.  
+
+### Theoretical explanation
 
 Idea to solve this problem is based on continuous broadcasting light flashes.  
 In this approach speed of light is not calculated by one measurment but by series of measurments.
@@ -22,29 +29,29 @@ Measurement must be divided into 3 steps:
 2. Separation
 3. Measure
 
-### 1. Synchronization
+#### 1. Synchronization
 
 In this step Emitter (as source of light) and Gauge (detector of light) are connected.  
-Distance between them is equal 0.  
+In other words: distance between them is equal 0.  
 
-It can be assumed that light is released from Emitter and received by Gauge is the same time.
+It can be assumed that light is released from Emitter and received by Gauge is the same moment of time.
 
 Emitter is resposible for sending light as signal with two states: ON / OFF.  
-Time of light ON and time of light OFF is permanent.  
+Time duration of light ON and time duration of light OFF is permanent.  
 Both times are set in Emitter and can be set in Gauge.  
 
-In Synchronization Emitter is sending light signals and Gauge is adapting.  
-By this process Emitter "metronome" and Gauge "metronome" are synchronized.
+During synchronization Emitter is sending light signals and Gauge is adapting to them.  
+By this process Emitter "metronome" and Gauge "metronome" are being synchronized.
 
 Delay between releasing light and receiving should be equal 0.
 
 ![Synchronization illustraion](Synchronization.png)
 
-### 2. Separation
+#### 2. Separation
 
 After synchronization, Gauge can be disconnected from Emitter.  
 In this step Gauge is moving in one direction to target position - away from Emitter.  
-Movement can be done slowly or fast.
+Movement can be done slowly or fast - theoretical it doesn't matter for result.
 
 During this porcess Emitter is constantly sending light signals (ON/OFF) - according to Emitter "metronome".
 
@@ -57,12 +64,14 @@ After reaching target position, delay is constant.
 
 ![Separation illustraion](Separation.png)
 
-### 3. Measure
+#### 3. Measure
 
-After separation, Gauge can measure speed of light.
+After separation, Gauge can start measuring speed of light.
 
 Emitter is still constantly sending light signals (ON/OFF) - according to Emitter "metronome".  
 Gauge is still receiving signals ON/OFF but with constant delay.
+
+Now using this two values distance and delay - speed of light can be calculated. 
 
 ![Measure illustraion](Measure.png)
 
@@ -70,14 +79,16 @@ Gauge is still receiving signals ON/OFF but with constant delay.
 
 ### Author
 
-Mateusz Skafiriak
+Mateusz Skafiriak  
+[LinkedIn](https://www.linkedin.com/in/mateusz-skafiriak)  
+[GitHub](https://github.com/N0N4M3pl)
 
 ### Timeline
 
-2022-02-05 - Document added: "Theoretical explanation of how to measure the speed of light in one way" 
-2022-02-04 - web aplication : finished
-2022-01-11 - web aplication: git init and first commit  
-2022-01-09 - watched Veritasium video  
+2022-02-05 - Document added: "Theoretical explanation of how to measure the speed of light in one way"  
+2022-02-04 - Web aplication : finished  
+2022-01-11 - Web aplication: git init and first commit  
+2022-01-09 - Watched Veritasium video "Why The Speed Of Light* Can't Be Measured"  
 
 ### Licence
 

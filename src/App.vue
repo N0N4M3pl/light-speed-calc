@@ -2,17 +2,38 @@
   <v-app>
     <v-app-bar app color="blue-grey darken-3">
       <v-icon large color="white">mdi-calculator-variant</v-icon>
-      <div class="text-overline white--text ml-2">
+      <span class="text-overline white--text ml-2">
         light-speed-calc
-      </div>
+      </span>
       <v-spacer></v-spacer>
-      <div class="text-caption white--text">
+      <span class="text-caption white--text">
         By Mateusz Skafiriak
-      </div>
+      </span>
+      <v-btn icon href="https://www.linkedin.com/in/mateusz-skafiriak" target="_blank" class="ml-4"
+        ><v-icon color="white">mdi-linkedin</v-icon></v-btn
+      >
+      <v-btn icon href="https://github.com/N0N4M3pl" target="_blank"><v-icon color="white">mdi-github</v-icon></v-btn>
     </v-app-bar>
 
     <v-main>
       <v-container class="grey lighten-4">
+        <v-row class="mb-4">
+          <v-col cols="3"
+            ><v-avatar color="blue-grey" size="34" class="mr-2 white--text"
+              ><v-icon color="white">
+                mdi-information-outline
+              </v-icon></v-avatar
+            ><span class="font-italic text-caption"><b>Info</b></span></v-col
+          >
+          <v-col cols="9">
+            <p>
+              Before using this calculator it is recommended to read this document:
+              <a href="https://github.com/N0N4M3pl/light-speed-calc/blob/main/doc/theoretical-explanation-of-how-tomeasure-the-speed-of-light-in-one-way.md" target="_blank">Theoretical explanation of how to measure the speed of light in one way</a>
+            </p>
+            <p>More tchnical information about this application can be found here: <a href="https://github.com/N0N4M3pl/light-speed-calc#readme" target="_blank">Readme</a></p>
+          </v-col>
+        </v-row>
+
         <v-row class="mb-4 grey lighten-2">
           <v-col cols="3"
             ><v-avatar color="blue-grey" size="34" class="mr-2 white--text">1</v-avatar
