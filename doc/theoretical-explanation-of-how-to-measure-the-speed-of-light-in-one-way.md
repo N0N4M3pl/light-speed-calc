@@ -85,11 +85,11 @@ Mateusz Skafiriak
 
 ### Timeline
 
-2022-02-06 - Document and web-applicaation are released in public    
-2022-02-05 - Document added: "Theoretical explanation of how to measure the speed of light in one way"  
-2022-02-04 - Web aplication : finished  
-2022-01-11 - Web aplication: git init and first commit  
-2022-01-09 - Watched Veritasium video "Why The Speed Of Light* Can't Be Measured"  
+2021-02-06 - Document and web-applicaation are released in public    
+2021-02-05 - Document added: "Theoretical explanation of how to measure the speed of light in one way"  
+2021-02-04 - Web aplication : finished  
+2021-01-11 - Web aplication: git init and first commit  
+2021-01-09 - Watched Veritasium video "Why The Speed Of Light* Can't Be Measured"  
 
 ### Licence
 
