@@ -15,7 +15,7 @@ Source timer and detector timer cannot be started at exactly same time.
 
 ### At first
 
-This solution is only based on theoretical model and web application simulation.  
+This solution is only based on theoretical model and [web application simulation](http://bfbxrcu.cluster028.hosting.ovh.net/light-speed-calc/).  
 It was not done in real environment, using real, existing devices.  
 
 ### Theoretical explanation
@@ -85,6 +85,7 @@ Mateusz Skafiriak
 
 ### Timeline
 
+2022-02-06 - Document and web-applicaation are released in public    
 2022-02-05 - Document added: "Theoretical explanation of how to measure the speed of light in one way"  
 2022-02-04 - Web aplication : finished  
 2022-01-11 - Web aplication: git init and first commit  

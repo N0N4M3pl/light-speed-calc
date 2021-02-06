@@ -3,7 +3,7 @@
 Project is divided into two parts:
 
 - Document
-- Web application: [light-speed-calc]()
+- Web application
 
 ## Document
 
@@ -12,6 +12,8 @@ Before using application it is recommended to read this document:
 [Theoretical explanation of how to measure the speed of light in one way](/doc/theoretical-explanation-of-how-tomeasure-the-speed-of-light-in-one-way.md)
 
 ## Web aplication
+
+Working online application: [light-speed-calc](http://bfbxrcu.cluster028.hosting.ovh.net/light-speed-calc/)  
 
 Web aplication is only simulation tool.  
 
