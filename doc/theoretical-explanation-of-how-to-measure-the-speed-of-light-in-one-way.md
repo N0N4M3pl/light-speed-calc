@@ -81,7 +81,7 @@ Now using this two values distance and delay - speed of light can be calculated.
 
 Mateusz Skafiriak  
 [LinkedIn](https://www.linkedin.com/in/mateusz-skafiriak)  
-[GitHub](https://github.com/N0N4M3pl)
+[GitHub](https://github.com/N0N4M3pl/light-speed-calc)
 
 ### Timeline
 

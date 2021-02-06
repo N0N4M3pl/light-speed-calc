@@ -12,7 +12,7 @@
       <v-btn icon href="https://www.linkedin.com/in/mateusz-skafiriak" target="_blank" class="ml-4"
         ><v-icon color="white">mdi-linkedin</v-icon></v-btn
       >
-      <v-btn icon href="https://github.com/N0N4M3pl" target="_blank"><v-icon color="white">mdi-github</v-icon></v-btn>
+      <v-btn icon href="https://github.com/N0N4M3pl/light-speed-calc" target="_blank"><v-icon color="white">mdi-github</v-icon></v-btn>
     </v-app-bar>
 
     <v-main>
