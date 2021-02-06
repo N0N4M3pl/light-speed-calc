@@ -9,7 +9,7 @@ Project is divided into two parts:
 
 Before using application it is recommended to read this document:  
 
-[Theoretical explanation of how to measure the speed of light in one way](/doc/theoretical-explanation-of-how-tomeasure-the-speed-of-light-in-one-way.md)
+[Theoretical explanation of how to measure the speed of light in one way](/doc/theoretical-explanation-of-how-to-measure-the-speed-of-light-in-one-way.md)
 
 ## Web aplication
 

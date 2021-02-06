@@ -28,7 +28,7 @@
           <v-col cols="9">
             <p>
               Before using this calculator it is recommended to read this document:
-              <a href="https://github.com/N0N4M3pl/light-speed-calc/blob/main/doc/theoretical-explanation-of-how-tomeasure-the-speed-of-light-in-one-way.md" target="_blank">Theoretical explanation of how to measure the speed of light in one way</a>
+              <a href="https://github.com/N0N4M3pl/light-speed-calc/blob/main/doc/theoretical-explanation-of-how-to-measure-the-speed-of-light-in-one-way.md" target="_blank">Theoretical explanation of how to measure the speed of light in one way</a>
             </p>
             <p>More tchnical information about this application can be found here: <a href="https://github.com/N0N4M3pl/light-speed-calc#readme" target="_blank">Readme</a></p>
           </v-col>
